@@ -1,28 +1,17 @@
 import unittest
-
 from datetime import date, timedelta
-
 from unittest.mock import AsyncMock, MagicMock, Mock
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.entity.models import Contact, User
-
+from src.repository.contacts import (create_contact, find_contact_by_email,
+                                     find_contact_by_first_name,
+                                     find_contact_by_last_name,
+                                     get_all_contacts, get_contact,
+                                     get_contacts, remove_contact,
+                                     upcoming_birthdays, update_contact)
 from src.schemas.schemas import ContactModel
-
-from src.repository.contacts import (
-    get_contacts,
-    get_all_contacts,
-    create_contact,
-    get_contact,
-    update_contact,
-    remove_contact,
-    find_contact_by_first_name,
-    find_contact_by_last_name,
-    find_contact_by_email,
-    upcoming_birthdays,
-
-)
 
 
 class TestAsyncContacts(unittest.IsolatedAsyncioTestCase):
@@ -196,9 +185,6 @@ class TestAsyncContacts(unittest.IsolatedAsyncioTestCase):
         skip = 0
         limit = 10
         expected_result = []
-
-        print(f"CURRENT DATE: {current_date}")
-        print(f"TO DATE: {to_date}")
 
         contacts = [Contact(id=1,
                             first_name='test_first_name_1',

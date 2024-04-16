@@ -26,6 +26,10 @@ class DatabaseSessionManager:
         finally:
             await session.close()
 
+    @property
+    def engine(self):
+        return self._engine
+
 
 sessionmanager = DatabaseSessionManager(config.DB_URL)
 

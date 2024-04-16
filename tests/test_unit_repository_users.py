@@ -1,18 +1,13 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.entity.models import User
-from src.repository.users import (
-    get_user_by_email,
-    create_user,
-    update_token,
-    confirmed_email,
-    update_avatar_url,
-    store_reset_token,
-    verify_reset_token,
-    update_password
-)
+from src.repository.users import (confirmed_email, create_user,
+                                  get_user_by_email, store_reset_token,
+                                  update_avatar_url, update_password,
+                                  update_token, verify_reset_token)
 from src.schemas.user import UserModel, UserResponse
 from src.services.auth import Auth
 

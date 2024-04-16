@@ -1,5 +1,6 @@
 from fastapi import Depends, HTTPException, Request, status
 
+from src.conf import messages
 from src.entity.models import Role, User
 from src.services.auth import auth_service
 
@@ -14,5 +15,5 @@ class RoleAccess:
         if user.role not in self.allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access Forbidden"
+                detail=messages.ACCESS_FORBIDDEN
             )

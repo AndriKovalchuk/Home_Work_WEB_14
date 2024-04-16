@@ -3,7 +3,7 @@ from datetime import date
 from typing import Optional
 
 from fastapi import HTTPException, status
-from pydantic import BaseModel, EmailStr, Field, field_validator, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 from src.schemas.user import UserResponse
 

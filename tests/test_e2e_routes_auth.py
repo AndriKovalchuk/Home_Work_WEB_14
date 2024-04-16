@@ -1,22 +1,22 @@
-import pytest
 from unittest.mock import Mock
 
+import pytest
 from sqlalchemy import select
 
+from src.conf import messages
 from src.entity.models import User
 from tests.conftest import TestingSessionLocal
-from src.conf import messages
 
 user_data = {"username": "test_username", "email": "test_email@example.com", "password": "12345678"}
 
 
 def test_signup(client, monkeypatch):
-    mock_send_email = Mock()
-    monkeypatch.setattr("src.routes.auth.send_email", mock_send_email)
-    response = client.post("api/auth/signup", json=user_data)
-    assert response.status_code == 201, response.text
-    data = response.json()
-    assert data["username"] == user_data["username"]
+    mock_send_email = Mock()  # автоматично створить мок-об'єкт з усіма необхідними методами та атрибутами, включно з await, який використовується у функції send_email.
+    monkeypatch.setattr("src.routes.auth.send_email", mock_send_email)  # Метод monkeypatch.setattr підміняє виклик функції send_email з модуля src.routes.auth на мок-об'єкт mock_send_email.
+    response = client.post("api/auth/signup", json=user_data)  # Далі client.post виконує POST-запит на вказану URL-адресу /api/auth/signup, передаючи в тілі запиту JSON-представлення даних користувача user.
+    assert response.status_code == 201, response.text  #  переконуємося, що код стану відповіді сервера дорівнює 201 (успішне створення ресурсу)
+    data = response.json()  # Перевіряємо дані, що повертаються
+    assert data["username"] == user_data["username"]  # Перевіряємо, що ім'я нового користувача дорівнює очікуваній.
     assert data["email"] == user_data["email"]
     assert "password" not in data
     assert "avatar" in data
@@ -38,7 +38,7 @@ def test_email_not_confirmed_login(client):
                                                    "password": user_data.get("password")})
     assert response.status_code == 401, response.text
     data = response.json()
-    assert data["detail"] == "Email not confirmed"
+    assert data["detail"] == messages.EMAIL_NOT_CONFIRMED
 
 
 @pytest.mark.asyncio
@@ -64,7 +64,7 @@ def test_wrong_password_login(client):
                                                    "password": "password"})
     assert response.status_code == 401, response.text
     data = response.json()
-    assert data["detail"] == "Invalid password"
+    assert data["detail"] == messages.INVALID_PASSWORD
 
 
 def test_wrong_email_login(client):
@@ -72,4 +72,15 @@ def test_wrong_email_login(client):
                                                    "password": user_data.get("password")})
     assert response.status_code == 401, response.text
     data = response.json()
-    assert data["detail"] == "Invalid email address"
+    assert data["detail"] == messages.INVALID_EMAIL_ADDRESS
+
+
+def test_validation_error(client):
+    response = client.post("api/auth/login",
+                           data={"password": user_data.get("password")})
+    assert response.status_code == 422, response.text
+    data = response.json()
+    assert "detail" in data
+
+
+

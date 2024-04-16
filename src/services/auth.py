@@ -6,13 +6,12 @@ import redis
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.conf.config import config
 from src.database.db import get_db
 from src.repository import users as repository_users
-
-from passlib.context import CryptContext
 
 
 class Auth:

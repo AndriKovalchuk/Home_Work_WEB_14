@@ -227,7 +227,7 @@ async def find_contact_by_last_name(contact_last_name: str, current_user: User, 
 """
 
 
-async def find_contact_by_email(contact_email: str, current_user: User, db: AsyncSession) -> list[Contact]:
+async def find_contact_by_email(contact_email: str, current_user: User, db: AsyncSession) -> Contact:
     """
     The find_contact_by_email function searches for a contact by email address.
         Args:

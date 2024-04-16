@@ -7,6 +7,7 @@ from fastapi_limiter.depends import RateLimiter
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.conf import messages
 from src.database.db import get_db
 from src.entity.models import Contact, Role, User
 from src.repository import contacts as repository_contacts
@@ -21,7 +22,7 @@ access_to_route_all = RoleAccess([Role.admin, Role.moderator])
 """
 Router.
 Отримати список всіх контактів.
-Валідація не відбувається.
+Валідація не відбувається. 
 """
 
 
@@ -116,7 +117,7 @@ async def get_contact(contact_id: int = Path(ge=1),
     if not contact:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Contact not found"
+            detail=messages.CONTACT_NOT_FOUND
         )
     return contact
 
@@ -153,19 +154,19 @@ async def update_contact(body: ContactModel,
     if email_exists:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Contact with the mentioned email already exists."
+            detail=messages.CONTACT_NUMBER_EMAIL_EXISTS
         )
 
     if number_exists:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Contact with the mentioned contact number already exists."
+            detail=messages.CONTACT_NUMBER_EMAIL_EXISTS
         )
 
     contact = await repository_contacts.update_contact(contact_id, body, current_user, db)
 
     if contact is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Todo with id {contact_id} not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.CONTACT_NOT_FOUND)
     return contact
 
 

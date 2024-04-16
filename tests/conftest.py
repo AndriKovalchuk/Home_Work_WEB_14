@@ -1,13 +1,16 @@
 import asyncio
+from datetime import datetime
 
 import pytest
+import pytest_asyncio
 from fastapi.testclient import TestClient
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
+                                    create_async_engine)
 from sqlalchemy.pool import StaticPool
 
 from main import app
-from src.entity.models import Base, User
 from src.database.db import get_db
+from src.entity.models import Base, Contact, User
 from src.services.auth import auth_service
 
 SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
@@ -28,8 +31,25 @@ def init_models_wrap():
             await conn.run_sync(Base.metadata.create_all)
         async with TestingSessionLocal() as session:
             hash_password = auth_service.get_password_hash(test_user["password"])
-            current_user = User(username=test_user["username"], email=test_user["email"], password=hash_password, confirmed=True, role="admin")
+            current_user = User(username=test_user["username"],
+                                email=test_user["email"],
+                                password=hash_password,
+                                confirmed=True,
+                                role="admin")
             session.add(current_user)
+
+            birth_date = datetime(1980, 4, 18)
+            new_contact = Contact(
+                first_name="James config",
+                last_name="Bond",
+                email="james_bond@gmail.com",
+                contact_number="777-777-7777",
+                birth_date=birth_date,
+                additional_information=None,
+                user_id=current_user.id
+            )
+            session.add(new_contact)
+
             await session.commit()
 
     asyncio.run(init_models())
@@ -50,3 +70,10 @@ def client():
     app.dependency_overrides[get_db] = override_get_db  # while testing, pytest will be using SQL_DB
 
     yield TestClient(app)
+
+
+@pytest_asyncio.fixture()
+async def get_token():
+    token = await auth_service.create_access_token(data={"sub": test_user["email"]})
+    return token
+
